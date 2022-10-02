@@ -1,7 +1,9 @@
-import { Fragment } from 'react';
-import { Outlet} from 'react-router-dom';
+import { Fragment, useRef } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
+
+import { useCloseOnOutsideClick } from '../../hooks/useCloseOnOutsideClick';
 
 import { selectCurrentUser } from '../../store/user/user.selector';
 import { selectIsCartDropdownOpen } from '../../store/cart/cart.selector';
@@ -13,13 +15,25 @@ import { ReactComponent as CrwnLogo } from '../../assets/crown.svg';
 
 import { NavigationContainer, LogoContainer, NavLinks, NavLink } from './navigation.styles';
 import { signOutStart } from '../../store/user/user.action';
+import { useEffect } from 'react';
+import { setIsCartDropdownOpen } from '../../store/cart/cart.action';
 
 const Navigation = () => {
 
     const currentUser = useSelector(selectCurrentUser);
     const isCartDropdownOpen = useSelector(selectIsCartDropdownOpen);
 
+    const dropdownRef = useRef(null);
+    const dropdownIconRef = useRef(null);
+    const isOutsideDropdownClick = useCloseOnOutsideClick(dropdownRef, dropdownIconRef);
+
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isOutsideDropdownClick) {
+            dispatch(setIsCartDropdownOpen(false));
+        }
+    }, [isOutsideDropdownClick])
 
     const signOutUser = () => dispatch(signOutStart());
 
@@ -46,10 +60,10 @@ const Navigation = () => {
 
                     }
 
-                    <CartIcon />
+                    <CartIcon ref={dropdownIconRef}/>
                 </NavLinks>
                 {
-                    isCartDropdownOpen && <CartDropdown />
+                    isCartDropdownOpen && <CartDropdown ref={dropdownRef} />
                 }
             </NavigationContainer>
             <Outlet />

@@ -1,9 +1,11 @@
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 
 import { selectTotalPrice } from "../../store/cart/cart.selector"; 
 import { selectCurrentUser } from "../../store/user/user.selector";
+
+import { clearCart } from "../../store/cart/cart.action";
 
 import { BUTTON_TYPE_CLASSES } from "../button/button.component";
 
@@ -15,6 +17,8 @@ const PaymentForm = () => {
     const elements = useElements();
     const amount = useSelector(selectTotalPrice);
     const currentUser = useSelector(selectCurrentUser);
+
+    const dispatch = useDispatch();
 
     const [isProcessingPayment, setProcessingPayment] = useState(false);
 
@@ -31,12 +35,17 @@ const PaymentForm = () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                amount
+                amount: amount * 100
             })
         }).then(res => res.json());
 
-        const { client_secret } = response.paymentIntent;
-        
+        if (response.error) {
+            setProcessingPayment(false);
+            alert(`An error occured while making the payment: ${response.error.code}`);
+            return;
+        }
+
+        const { paymentIntent: { client_secret } } = response;
         const paymentResult = await stripe.confirmCardPayment(client_secret, {
             payment_method: {
                 card: elements.getElement(CardElement),
@@ -49,9 +58,11 @@ const PaymentForm = () => {
         setProcessingPayment(false);
 
         if (paymentResult.error) {
-            alert(paymentResult.error);
+            alert(`An error occured while making the payment: ${paymentResult.error.message}`);
         } else {
             if (paymentResult.paymentIntent.status === 'succeeded') {
+                dispatch(clearCart());
+                elements.getElement(CardElement).clear();
                 alert('Payment Successful');
             }
         }

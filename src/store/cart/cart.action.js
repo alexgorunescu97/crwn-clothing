@@ -8,17 +8,21 @@ export const setIsCartDropdownOpen = (isOpen) => createAction(CART_ACTION_TYPES.
 export const addItemToCart = (cartItems, itemToAdd) => {
     const newCartItems = addCartItem(cartItems, itemToAdd);
     return createAction(CART_ACTION_TYPES.SET_CART_ITEMS, newCartItems);
-  };
+};
 
 export const removeItemFromCart = (cartItems, itemToRemove) => {
     const newCartItems = removeCartItem(cartItems, itemToRemove);
     return createAction(CART_ACTION_TYPES.SET_CART_ITEMS, newCartItems);
-  };
+};
 
 export const clearItemFromCart = (cartItems, cartItemToClear) => {
     const newCartItems = clearCartItem(cartItems, cartItemToClear);
     return createAction(CART_ACTION_TYPES.SET_CART_ITEMS, newCartItems);
-  };
+};
+
+export const clearCart = () => {
+    return createAction(CART_ACTION_TYPES.SET_CART_ITEMS, []);
+}
 
 const addCartItem = (cartItems, itemToAdd) => {
     const existingCartItem = cartItems.find(cartItem => cartItem.id === itemToAdd.id);
