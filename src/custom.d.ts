@@ -1,0 +1,1 @@
+/// <reference path="../node_modules/react-scripts/lib/react-app.d.ts" />
