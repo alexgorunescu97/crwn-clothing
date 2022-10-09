@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export const useCloseOnOutsideClick = (dropdownRef: React.RefObject<HTMLDivElement>, dropdownIconRef: React.RefObject<HTMLDivElement>) => {
+export const useCloseOnOutsideClick = (dropdownRef: React.RefObject<HTMLElement>, dropdownIconRef: React.RefObject<HTMLElement>) => {
 
     const [isClickOutside, setIsClickOutside] = useState(false);
 
